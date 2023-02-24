@@ -3,6 +3,7 @@ from werkzeug.exceptions import NotFound
 
 from .users import USERS
 
+
 articles_app = Blueprint("articles_app", __name__)
 ARTICLES = {
     1: {'title': "Flask", "text": "text Flask", "author": 1},
@@ -19,9 +20,9 @@ def articles_list():
 @articles_app.route("/<int:article_id>/", endpoint="details")
 def article_details(article_id: int):
     try:
-        article_name = ARTICLES[article_id]['title']
         article_text = ARTICLES[article_id]['text']
         article_author_id = ARTICLES[article_id]['author']
+        article_name = ARTICLES[article_id]['title']
         article_author = USERS[article_author_id]
     except KeyError:
         raise NotFound(f"Article #{article_id} doesn't exist!")
