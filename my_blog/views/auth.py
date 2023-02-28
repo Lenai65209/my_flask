@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import \
     LoginManager, login_user, logout_user, login_required
 
-from my_blog.models.user import User
+from ..models.user import User
 
 auth_app = Blueprint("auth_app", __name__, url_prefix="/auth",
                      static_folder="../static")

@@ -1,15 +1,29 @@
 import os
 
 from flask import Flask, render_template
+from flask_migrate import Migrate
 
-from my_blog.models.database import db
-from my_blog.views.articles import articles_app
-from my_blog.views.auth import login_manager, auth_app
-from my_blog.views.users import users_app
+from .models.database import db
+from .views.articles import articles_app
+from .views.auth import login_manager, auth_app
+from .views.users import users_app
+from .configs import DevConfig
 
 app = Flask(__name__)
 app.register_blueprint(users_app)
 app.register_blueprint(articles_app, url_prefix="/articles")
+
+migrate = Migrate(app, db, compare_type=True)
+
+# from my_blog.configs import DevConfig
+app.config.from_object(DevConfig)
+# app.config.from_pyfile('config.cfg')
+
+# app.config["CONFIG_NAME"] = "DevConfig"
+# cfg_name = os.environ.get("CONFIG_NAME") or "ProductionConfig"
+# app.config.from_object(f"my_flask.configs.{cfg_name}")
+# app.config.from_object(config.get("CONFIG_NAME" or "ProductionConfig"))
+# app.config.from_object(os.environ.get("FLASK_CONFIG") or "ProductionConfig")
 
 file_path = os.path.abspath(os.getcwd()) + "\database.db"
 # app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////tmp/blog.db"
