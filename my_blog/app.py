@@ -3,17 +3,16 @@ import os
 from flask import Flask, render_template
 from flask_migrate import Migrate
 
+from .configs import DevConfig
 from .models.database import db
+from .security import flask_bcrypt
 from .views.articles import articles_app
 from .views.auth import login_manager, auth_app
 from .views.users import users_app
-from .configs import DevConfig
 
 app = Flask(__name__)
 app.register_blueprint(users_app)
 app.register_blueprint(articles_app, url_prefix="/articles")
-
-migrate = Migrate(app, db, compare_type=True)
 
 # from my_blog.configs import DevConfig
 app.config.from_object(DevConfig)
@@ -35,6 +34,10 @@ app.config["SECRET_KEY"] = "123456"
 app.register_blueprint(auth_app, url_prefix="/auth")
 login_manager.init_app(app)
 
+flask_bcrypt.init_app(app)
+
+migrate = Migrate(app, db, compare_type=True, render_as_batch=True)
+
 
 @app.route("/")
 def index():
@@ -47,14 +50,14 @@ def hello(name=None):
     return render_template('hello.html', name=name)
 
 
-@app.cli.command("init-db")
-def init_db():
-    """
-    Run in your terminal:
-    flask init-db
-    """
-    db.create_all()
-    print("done!")
+# @app.cli.command("init-db")
+# def init_db():
+#     """
+#     Run in your terminal:
+#     flask init-db
+#     """
+#     db.create_all()
+#     print("done!")
 
 
 @app.cli.command("create-users")
@@ -65,9 +68,24 @@ def create_users():
     > done! created users: <User #1 'admin'> <User #2 'james'>
     """
     from my_blog.models.user import User
-    admin = User(username="admin", is_staff=True)
-    james = User(username="james")
-    db.session.add(admin)
+    ivan = User(username="admin", is_staff=True, password="1")
+    james = User(username="james", password="2")
+    db.session.add(ivan)
     db.session.add(james)
     db.session.commit()
-    print("done! created users:", admin, james)
+    print("done! created users:", ivan, james)
+
+
+@app.cli.command("create-admin")
+def create_admin():
+    """
+    Run in your terminal:
+    ➜ flask create-admin
+    > created admin: <User #1 'admin'>
+    """
+    from my_blog.models.user import User
+    admin = User(username="admin", is_staff=True)
+    admin.password = os.environ.get("ADMIN_PASSWORD") or "adminpass"
+    db.session.add(admin)
+    db.session.commit()
+    print("created admin:", admin)
