@@ -7,12 +7,6 @@ from ..models.user import User
 users_app = Blueprint("users_app", __name__, url_prefix="/users",
                       static_folder="../static")
 
-USERS = {
-    1: "admin",
-    2: "james",
-    3: "Peter",
-}
-
 
 @users_app.route("/", endpoint="list")
 @login_required

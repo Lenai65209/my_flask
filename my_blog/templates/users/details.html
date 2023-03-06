@@ -6,9 +6,18 @@ User #{{ user.id }}
 <h1>
     {{ user.username }}
 </h1>
+<h2>
+    {{ user.first_name }} {{ user.last_name }}
+</h2>
 {% if user.is_staff %}
 <span class="badge bg-secondary">staff</span>
 {% endif %}
+Articles:
+<ul>
+    {% for article in user.author.articles %}
+    <li>{{article.id}} - {{ article.title }}</li>
+    {% endfor %}
+</ul>
 <div>
     <a href="{{ url_for('users_app.list') }}">Back to users list</a>
 </div>

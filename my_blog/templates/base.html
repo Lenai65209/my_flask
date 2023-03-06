@@ -36,8 +36,8 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    {% for (endpoint, label) in [('users_app.list', 'Users'),
-                    ('articles_app.list', 'Articles')] %}
+                    {% for (endpoint, label) in [('users_app.list', 'Users'), ('authors_app.list', 'Authors'),
+                    ('articles_app.list', 'Articles')] %} 
                     <a href="{{ url_for(endpoint) }}"
                        class="nav-link {% if request.endpoint == endpoint -%}active{%- endif %}"
                     >
@@ -74,5 +74,18 @@
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
 {% endblock %}
+{% for (endpoint, label) in [('auth_app.login', 'Login'), ('auth_app.register',
+'Register')] %}
+<a href="{{ url_for(endpoint) }}"
+   class="nav-link {% if request.endpoint == endpoint -%}active{%- endif %}">
+    {{ label }}
+</a>
+{% endfor %}
+{% for (endpoint, label) in [
+('users_app.list', 'Users'),
+('articles_app.list', 'Articles'),
+('authors_app.list', 'Authors'),
+] %}
+{% endfor %}
 </body>
 </html>
