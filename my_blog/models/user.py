@@ -1,5 +1,6 @@
 from flask_login import UserMixin
 from sqlalchemy import Column, Integer, String, Boolean, LargeBinary
+from sqlalchemy.orm import relationship
 
 from .database import db
 from ..security import flask_bcrypt
@@ -17,6 +18,7 @@ class User(db.Model, UserMixin):
                         server_default="")
     last_name = Column(String(120), unique=False, nullable=False, default="",
                        server_default="")
+    author = relationship("Author", uselist=False, back_populates="user")
 
     def __repr__(self):
         return f"<User #{self.id} {self.username!r}>"

@@ -7,25 +7,18 @@ from .configs import DevConfig
 from .models.database import db
 from .security import flask_bcrypt
 from .views.articles import articles_app
+from .views.authors import authors_app
 from .views.auth import login_manager, auth_app
 from .views.users import users_app
 
 app = Flask(__name__)
 app.register_blueprint(users_app)
 app.register_blueprint(articles_app, url_prefix="/articles")
+app.register_blueprint(authors_app, url_prefix="/authors")
 
-# from my_blog.configs import DevConfig
 app.config.from_object(DevConfig)
-# app.config.from_pyfile('config.cfg')
-
-# app.config["CONFIG_NAME"] = "DevConfig"
-# cfg_name = os.environ.get("CONFIG_NAME") or "ProductionConfig"
-# app.config.from_object(f"my_flask.configs.{cfg_name}")
-# app.config.from_object(config.get("CONFIG_NAME" or "ProductionConfig"))
-# app.config.from_object(os.environ.get("FLASK_CONFIG") or "ProductionConfig")
 
 file_path = os.path.abspath(os.getcwd()) + "\database.db"
-# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////tmp/blog.db"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + file_path
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
@@ -48,16 +41,6 @@ def index():
 @app.route('/hello/<name>')
 def hello(name=None):
     return render_template('hello.html', name=name)
-
-
-# @app.cli.command("init-db")
-# def init_db():
-#     """
-#     Run in your terminal:
-#     flask init-db
-#     """
-#     db.create_all()
-#     print("done!")
 
 
 @app.cli.command("create-users")
