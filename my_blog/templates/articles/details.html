@@ -11,5 +11,12 @@ Article #{{ article.id }}: {{ article.title }}
     <div>Published {{ article.dt_created }}</div>
     <div>by {{ article.author.user.first_name }} {{ article.author.user.last_name }} </div>
 </div>
+{% if article.tags %}
+<div>Tags:</div>
+<ul>
+    {% for tag in article.tags %}
+        <li><span class="badge bg-primary">{{ tag.name }}</span></li>
+    {% endfor %}
+</ul>
+{% endif %}
 {% endblock %}
-
