@@ -1,14 +1,17 @@
 from flask import Blueprint, render_template, request, current_app, redirect, \
     url_for
 from flask_login import login_required, current_user
+from flask_wtf import form
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import NotFound
 
-from ..forms.article import CreateArticleForm
-from ..models.author import Author
-from ..models.article import Article
-from ..models.database import db
 
+from ..forms.article import CreateArticleForm
+from ..models.article import Article
+from ..models.author import Author
+from ..models.tag import Tag
+from ..models.database import db
 
 articles_app = Blueprint("articles_app", __name__)
 users_app = Blueprint("users_app", __name__)
@@ -22,9 +25,16 @@ def articles_list():
 
 @articles_app.route("/<int:article_id>/", endpoint="details")
 def article_details(article_id: int):
-    article = Article.query.filter_by(id=article_id).one_or_none()
+    article = Article.query.filter_by(id=article_id).options(
+        joinedload(Article.tags)  # подгружаем связанные теги!
+        ).one_or_none()
     if article is None:
         raise NotFound
+    if request.method == "POST" and form.validate_on_submit():  # при создани истатьи
+        if form.tags.data:  # если в форму были переданы теги (были выбраны)
+            selected_tags = Tag.query.filter(Tag.id.in_(form.tags.data))
+            for tag in selected_tags:
+                article.tags.append(tag)  # добавляем выбранные теги к статье
     return render_template("articles/details.html", article=article)
 
 
@@ -33,11 +43,17 @@ def article_details(article_id: int):
 def create_article():
     error = None
     form = CreateArticleForm(request.form)
-    if request.method == "POST" and form.validate_on_submit():
+    # добавляем доступные теги в форму
+    form.tags.choices = [(tag.id, tag.name) for tag in Tag.query.order_by("name")]
+    if request.method == "POST" and form.validate_on_submit():  # при создании статьи
         _article = Article(title=form.title.data.strip(), body=form.body.data)
+        if form.tags.data: # если в форму были переданы теги (были выбраны)
+            selected_tags = Tag.query.filter(Tag.id.in_(form.tags.data))
+            for tag in selected_tags:
+                _article.tags.append(tag) # добавляем выбранные теги к статье
         if current_user.author:
             # use existing author if present
-            _author=current_user.author
+            _author = current_user.author
             _article.author_id = _author.id
         else:
             # otherwise create author record
