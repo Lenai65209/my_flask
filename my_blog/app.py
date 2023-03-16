@@ -11,6 +11,7 @@ from .views.authors import authors_app
 from .views.auth import login_manager, auth_app
 from .views.users import users_app
 from .admin import admin
+from .api import init_api
 
 app = Flask(__name__)
 app.register_blueprint(users_app)
@@ -24,6 +25,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + file_path
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 admin.init_app(app)
+api = init_api(app)
 
 app.config["SECRET_KEY"] = "123456"
 app.register_blueprint(auth_app, url_prefix="/auth")
