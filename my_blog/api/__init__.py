@@ -1,5 +1,7 @@
 from flask_combo_jsonapi import Api
 from combojsonapi.spec import ApiSpecPlugin
+from combojsonapi.event import EventPlugin
+from combojsonapi.permission import PermissionPlugin
 
 from .tag import TagList, TagDetail
 from .user import UserList, UserDetail
@@ -32,11 +34,15 @@ def create_api_spec_plugin(app):
 
 
 def init_api(app):
+    event_plugin = EventPlugin()
     api_spec_plugin = create_api_spec_plugin(app)
+    permission_plugin = PermissionPlugin(strict=False)
     api = Api(
         app,
         plugins=[
+            event_plugin,
             api_spec_plugin,
+            permission_plugin,
         ],
     )
     
