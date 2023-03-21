@@ -3,8 +3,9 @@
 Articles list
 {% endblock %}
 {% block body %}
-<h1>Articles</h1>
-
+<div class="row">
+    <h1>Articles (count: {{ count_articles }}, obtained from RPC call):</h1>
+</div>
 <div>
     <ul>
         {% for article in articles %}
